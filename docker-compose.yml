@@ -1,0 +1,31 @@
+version: "3.9"
+
+services:
+  traefik:
+    image: traefik:v2.11
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  whoami:
+    image: traefik/whoami
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.rule=Path(`/whoami`)"
+      - "traefik.http.routers.whoami.entrypoints=web"
+
+  hello-spring:
+    build:  C:/Users/DELL/eclipse-workspace/HelloWorld
+
+    container_name: hello-spring
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.hello.rule=Host(`takwa.com`)"
+      - "traefik.http.routers.hello.entrypoints=web"
+      - "traefik.http.services.hello.loadbalancer.server.port=8080"
